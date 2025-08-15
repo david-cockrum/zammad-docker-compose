@@ -13,31 +13,14 @@ ENV RAILS_ENV=production \
     RAILS_LOG_TO_STDOUT=true \
     BUNDLE_WITHOUT="test development"
 
-# Install system dependencies with security updates
+# Install essential build dependencies first
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        build-essential \
         curl \
-        git \
-        libpq-dev \
-        nodejs \
-        npm \
-        postgresql-client \
-        nginx \
-        memcached \
-        redis-server \
-        elasticsearch \
-        # Security-critical packages (ensure latest versions)
-        libpam0g \
-        libpam-modules \
-        libpam-runtime \
         ca-certificates \
-        openssl \
+        git \
         && \
-    # Remove unbound if not needed (addresses CVE-2025-5994)
-    apt-get remove -y unbound || true && \
-    # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

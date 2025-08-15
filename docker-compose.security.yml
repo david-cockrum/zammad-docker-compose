@@ -6,14 +6,7 @@ version: "3.8"
 services:
   # Override the zammad services to use patched base image
   zammad-backup:
-    image: ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
-    build:
-      context: .
-      dockerfile: Dockerfile.security-patched
-      cache_from:
-        - ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
-      args:
-        ZAMMAD_VERSION: ${VERSION:-6.5.1}
+    image: vantagepointconsult/zammad:6.5.1-secure
     security_opt:
       - no-new-privileges:true
       - seccomp:unconfined
@@ -23,7 +16,7 @@ services:
       - /run
 
   zammad-init:
-    image: ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
+    image: vantagepointconsult/zammad:6.5.1-secure
     security_opt:
       - no-new-privileges:true
     read_only: false
@@ -31,7 +24,7 @@ services:
       - /tmp
 
   zammad-nginx:
-    image: ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
+    image: vantagepointconsult/zammad:6.5.1-secure
     security_opt:
       - no-new-privileges:true
     read_only: true
@@ -41,7 +34,7 @@ services:
       - /var/run
 
   zammad-railsserver:
-    image: ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
+    image: vantagepointconsult/zammad:6.5.1-secure
     security_opt:
       - no-new-privileges:true
     read_only: false
@@ -50,7 +43,7 @@ services:
       - /app/tmp
 
   zammad-scheduler:
-    image: ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
+    image: vantagepointconsult/zammad:6.5.1-secure
     security_opt:
       - no-new-privileges:true
     read_only: false
@@ -58,7 +51,7 @@ services:
       - /tmp
 
   zammad-websocket:
-    image: ${IMAGE_REPO:-vantagepointconsult/zammad-patched}:${VERSION:-6.5.1-security}
+    image: vantagepointconsult/zammad:6.5.1-secure
     security_opt:
       - no-new-privileges:true
     read_only: false
