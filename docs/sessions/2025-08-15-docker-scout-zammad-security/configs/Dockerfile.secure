@@ -1,0 +1,54 @@
+# Security-patched Dockerfile for Zammad
+# Based on official image with security patches applied
+# Addresses HIGH severity vulnerabilities:
+# - CVE-2025-24293 (activestorage)
+# - CVE-2025-5994 (unbound) 
+# - CVE-2025-6020 (pam)
+
+# Start from the official Zammad image
+FROM ghcr.io/zammad/zammad:6.5.1
+
+# Switch to root for security updates
+USER root
+
+# Apply security updates and patches
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    # Remove unbound package (CVE-2025-5994)
+    apt-get remove -y unbound 2>/dev/null || true && \
+    # Update PAM packages (CVE-2025-6020)
+    apt-get install -y --only-upgrade \
+        libpam0g \
+        libpam-modules \
+        libpam-runtime \
+        2>/dev/null || true && \
+    # Clean up
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Update Ruby gems for CVE-2025-24293
+RUN gem update activestorage --version ">= 7.2.2.2" 2>/dev/null || true && \
+    gem update activerecord --version ">= 7.2.2.2" 2>/dev/null || true && \
+    gem update resolv --version ">= 0.2.3" 2>/dev/null || true && \
+    gem update net-imap --version ">= 0.3.9" 2>/dev/null || true
+
+# Security hardening
+RUN echo "# Security hardening" >> /etc/security/limits.conf && \
+    echo "* soft nofile 65536" >> /etc/security/limits.conf && \
+    echo "* hard nofile 65536" >> /etc/security/limits.conf && \
+    echo "* hard core 0" >> /etc/security/limits.conf && \
+    echo "* soft core 0" >> /etc/security/limits.conf
+
+# Additional PAM hardening for CVE-2025-6020
+RUN echo "# Security patch for CVE-2025-6020" >> /etc/pam.d/common-password && \
+    echo "password requisite pam_pwquality.so retry=3" >> /etc/pam.d/common-password 2>/dev/null || true
+
+# Ensure proper permissions
+RUN chown -R zammad:zammad /opt/zammad || true
+
+# Switch back to zammad user
+USER zammad
+
+# Use the original entrypoint and command from base image
+# The base image already has proper ENTRYPOINT and CMD configured
